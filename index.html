@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>MINDSCRIBE</title>
+  <style>
+    :root {
+      --bg-color: #f0fdf4;
+      --text-color: #333;
+      --panel-bg: white;
+      --heading-color: #2e7d32;
+    }
+
+    body.calm-mode {
+      --bg-color: #0f172a;
+      --text-color: #e2e8f0;
+      --panel-bg: #1e293b;
+      --heading-color: #6ee7b7;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      transition: background0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .dashboard {
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      color: var(--heading-color);
+      letter-spacing: 2px;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .panel {
+      flex: 1;
+      background: var(--panel-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: background 0.5s ease;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: var(--heading-color);
+    }
+
+    h3 {
+      margin-top: 15px;
+      font-size: 18px;
+      color: var(--heading-color);
+    }
+
+    .emoji {
+      font-size: 28px;
+      cursor: pointer;
+      margin: 5px;
+      transition: transform 0.2s;
+    }
+
+    .emoji.selected {
+      transform: scale(1.3);
+      border-bottom: 2px solid #4caf50;
+    }
+
+    textarea,
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .badge-counter {
+      margin-top: 10px;
+    }
+
+    .badge-item {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .badge-icon {
+      font-size: 20px;
+      margin-right: 8px;
+    }
+
+    .calendar {
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .calendar-header h4 {
+      margin: 0;
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .day {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .day.happy {
+      background: #ffeb3b;
+    }
+
+    .day.calm {
+      background: #80deea;
+    }
+
+    .day.anxious {
+      background: #ef9a9a;
+    }
+
+    .day.sad {
+      background: #90caf9;
+    }
+
+    .day.reflective {
+      background: #a5d6a7;
+    }
+
+    /* Badge animation */
+    @keyframes badgeReveal {
+      from {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .badge-popup {
+      animation: badgeReveal 0.6s ease-out;
+    }
+
+    /* Confetti animation */
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: var(--panel-bg);
+      padding: 40px;
+      border-radius: 16px;
+      text-align: center;
+      color: var(--text-color);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .breathing-circle {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #4caf50;
+      margin: 30px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      animation: breathe 8s infinite ease-in-out;
+    }
+
+    body.calm-mode .breathing-circle {
+      background: #3b82f6;
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: scale(1.5);
+        opacity: 1;
+      }
+    }
+
+    .header-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #calmToggle {
+      background: transparent;
+      border: 2px solid var(--heading-color);
+      color: var(--heading-color);
+      border-radius: 20px;
+      padding: 5px 15px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-top: 0;
+    }
+
+    #calmToggle:hover {
+      background: var(--heading-color);
+      color: var(--bg-color);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Breathing Modal -->
+  <div id="breathingModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 id="modalTitle">Take a deep breath...</h2>
+      <p>Let's take a minute to center yourself.</p>
+      <div class="breathing-circle" id="breatheText">Breathe In</div>
+      <button onclick="closeModal()">I'm feeling better</button>
+    </div>
+  </div>
+
+  <div class="header-controls">
+    <button id="calmToggle" onclick="toggleCalmMode()">🌙 Calm Mode</button>
+  </div>
+
+  <div class="dashboard">
+    <h1>MINDSCRIBE</h1>
+    <div class="container">
+      <!-- Left Panel -->
+      <div class="panel">
+        <h2>How are you feeling today?</h2>
+        <div id="moods">
+          <span class="emoji" data-mood="Happy">😊</span>
+          <span class="emoji" data-mood="Calm">😌</span>
+          <span class="emoji" data-mood="Anxious">😟</span>
+          <span class="emoji" data-mood="Sad">😢</span>
+          <span class="emoji" data-mood="Reflective">🤔</span>
+        </div>
+
+        <h3>New Journal Entry</h3>
+        <textarea id="entry" placeholder="Write your reflection..."></textarea>
+        <button onclick="submitEntry()">Submit Entry</button>
+
+        <h3>Prompt of the Day</h3>
+        <p id="prompt"></p>
+
+        <h3>Recent Journal Entries</h3>
+        <ul id="journalList"></ul>
+
+        <h3>Badges</h3>
+        <p id="streak">🔥 Streak: <span class="badge">0 days</span></p>
+        <div id="progressCircle"
+          style="width:100px;height:100px;border-radius:50%;border:8px solid #ccc;display:flex;justify-content:center;align-items:center;font-weight:bold;">
+          0%
+        </div>
+        <p id="encouragement"></p>
+        <div class="badge-counter">
+          <div class="badge-item"><span class="badge-icon">🏅</span>Consistency Champ – awarded for streaks</div>
+          <div class="badge-item"><span class="badge-icon">🦋</span>Mindful Explorer – awarded for gratitude notes</div>
+          <div class="badge-item"><span class="badge-icon">🌞</span>Positive Thinker – awarded for positive reflections
+          </div>
+        </div>
+        <button onclick="sendSupport()">Send Support</button>
+
+        <h3>Mood Calendar</h3>
+        <div class="calendar">
+          <div class="calendar-header">
+            <button onclick="prevMonth()">◀</button>
+            <h4 id="calendarTitle"></h4>
+            <button onclick="nextMonth()">▶</button>
+          </div>
+          <div class="calendar-weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+
+       <!-- Journal Entry Button -->
+        <button onclick="window.location.href='journal.html'">Go to Journal Entry</button>
+
+        <!-- Navigation Buttons -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          <button onclick="window.location.href='challenges.html'" style="flex:1;">🌞 Daily Challenges</button>
+          <button onclick="window.location.href='garden.html'" style="flex:1; background:#8e24aa;">🌺 Mood Garden</button>
+          <button onclick="window.location.href='wellness.html'" style="flex:1; background:#e65100;">🧘 Wellness</button>
+        </div>
+
+      </div>
+
+
+      <!-- Right Panel -->
+      <div class="panel">
+        <h2>Create an Entry</h2>
+        <input id="feeling" placeholder="How are you feeling?" />
+        <input id="gratitude" placeholder="Today I'm grateful for..." />
+        <div id="moods2">
+          <span class="emoji" data-mood="Happy">😊</span>
+          <span class="emoji" data-mood="Calm">😌</span>
+          <span class="emoji" data-mood="Sad">😢</span>
+          <span class="emoji" data-mood="Reflective">🤔</span>
+        </div>
+        <button onclick="submitEntry()">Submit Entry</button>
+
+        <h2>Community Feed</h2>
+        <ul id="feed">
+          <li><b>Anonymous:</b> Struggling with some anxious thoughts today…</li>
+          <li><b>You:</b> Feeling down and could use some encouragement.</li>
+        </ul>
+
+        <!-- ✨ New Quotes Section -->
+        <h2>Daily Inspiration</h2>
+        <div id="quotes">
+          <blockquote>
+            "Healing takes time, and asking for help is a courageous step."
+            <footer>— Dr. Maya Patel, Psychologist</footer>
+          </blockquote>
+          <blockquote>
+            "Your mental health is just as important as your physical health."
+            <footer>— Dr. James Lee, Psychiatrist</footer>
+          </blockquote>
+          <blockquote>
+            "Small reflections each day build resilience over time."
+            <footer>— Dr. Ananya Rao, Wellness Coach</footer>
+          </blockquote>
+        </div>
+      </div>
+
+
+      <script>
+        // Load Calm Mode Preference
+        if (localStorage.getItem("calmMode") === "true") {
+          document.body.classList.add("calm-mode");
+          document.getElementById("calmToggle").textContent = "☀️ Light Mode";
+        }
+
+        function toggleCalmMode() {
+          const isCalm = document.body.classList.toggle("calm-mode");
+          localStorage.setItem("calmMode", isCalm);
+          document.getElementById("calmToggle").textContent = isCalm ? "☀️ Light Mode" : "🌙 Calm Mode";
+        }
+
+        // Modal Logic
+        function closeModal() {
+          document.getElementById("breathingModal").style.display = "none";
+        }
+
+        let breatheInterval;
+        function startBreathingExercise() {
+          document.getElementById("breathingModal").style.display = "flex";
+          const text = document.getElementById("breatheText");
+          text.textContent = "Breathe In";
+          clearInterval(breatheInterval);
+          let isInhaling = true;
+          breatheInterval = setInterval(() => {
+            isInhaling = !isInhaling;
+            text.textContent = isInhaling ? "Breathe In" : "Breathe Out";
+          }, 4000); // 4 seconds in, 4 seconds out
+        }
+
+        // Attach event listeners to emojis for micro-interventions
+        document.addEventListener("DOMContentLoaded", () => {
+          document.querySelectorAll(".emoji").forEach(el => {
+            el.addEventListener("click", function () {
+              const mood = this.getAttribute("data-mood");
+              if (mood === "Anxious" || mood === "Sad") {
+                startBreathingExercise();
+              }
+              // highlight selected
+              document.querySelectorAll(".emoji").forEach(e => e.classList.remove("selected"));
+              this.classList.add("selected");
+              // sync inputs if needed
+              const feelingInput = document.getElementById("feeling");
+              if (feelingInput) feelingInput.value = mood;
+            });
+          });
+        });
+
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
+
+        // Update display right away
+        document.addEventListener("DOMContentLoaded", () => {
+          document.querySelector("#streak .badge").textContent = streakCount + " days";
+          updateProgress();
+        });
+
+        const monthNames = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+
+        const prompts = [
+          "What made you smile today?",
+          "What challenge did you overcome?",
+          "What are you grateful for right now?",
+          "What positive change have you noticed recently?"
+        ];
+
+        function loadPrompt() {
+          const todayIndex = new Date().getDate() % prompts.length;
+          document.getElementById("prompt").textContent = prompts[todayIndex];
+        }
+
+        function buildCalendar(month, year) {
+          const grid = document.getElementById("calendarGrid");
+          grid.innerHTML = "";
+          const title = document.getElementById("calendarTitle");
+          title.textContent = `${monthNames[month]} ${year}`;
+
+          const firstDay = new Date(year, month, 1).getDay();
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+          // Empty slots before first day
+          for (let i = 0; i < firstDay; i++) {
+            const empty = document.createElement("div");
+            grid.appendChild(empty);
+          }
+
+          // Fill days
+          for (let d = 1; d <= daysInMonth; d++) {
+            const day = document.createElement("div");
+            day.className = "day";
+            day.textContent = d;
+            grid.appendChild(day);
+          }
+        }
+
+        function prevMonth() {
+          currentMonth--;
+          if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+          }
+          buildCalendar(currentMonth, currentYear);
+        }
+
+        function nextMonth() {
+          currentMonth++;
+          if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+          }
+          buildCalendar(currentMonth, currentYear);
+        }
+
+        function submitEntry() {
+          const entry = document.getElementById("entry")?.value.trim();
+          const feeling = document.getElementById("feeling")?.value.trim();
+          const gratitude = document.getElementById("gratitude")?.value.trim();
+
+          let text = "";
+          if (entry) {
+            text = entry;
+          } else if (feeling || gratitude) {
+            text = `Feeling: ${feeling || "—"} | Grateful: ${gratitude || "—"}`;
+          }
+
+          if (!text) {
+            alert("Please write something!");
+            return;
+          }
+
+          const list = document.getElementById("journalList");
+          const li = document.createElement("li");
+          li.textContent = text;
+          list.appendChild(li);
+
+          streakCount++;
+          localStorage.setItem("streakCount", streakCount);
+          document.querySelector("#streak .badge").textContent = streakCount + " days";
+          updateProgress();
+          updateEncouragement();
+
+          if (streakCount === 7) {
+            showCelebration();
+          }
+
+          if (entry) document.getElementById("entry").value = "";
+          if (feeling) document.getElementById("feeling").value = "";
+          if (gratitude) document.getElementById("gratitude").value = "";
+        }
+
+        function sendSupport() {
+          alert("Support message sent to community!");
+        }
+
+        function showCelebration() {
+          const popup = document.createElement("div");
+          popup.style.position = "fixed";
+          popup.style.top = "0";
+          popup.style.left = "0";
+          popup.style.width = "100%";
+          popup.style.height = "100%";
+          popup.style.background = "rgba(0,0,0,0.8)";
+          popup.style.display = "flex";
+          popup.style.justifyContent = "center";
+          popup.style.alignItems = "center";
+          popup.style.zIndex = "9999";
+
+          popup.innerHTML = `
+        <div class="badge-popup" style="background:white; padding:40px; border-radius:12px; text-align:center; max-width:400px;">
+          <h2>🎉 Congratulations!</h2>
+          <h3>Consistency Champ</h3>
+          <p>7‑Day Streak! You’ve journaled 7 days in a row — Keep going!</p>
+          <button onclick="document.body.removeChild(this.parentNode.parentNode)">Close</button>
+        </div>
+      `;
+          document.body.appendChild(popup);
+          launchConfetti();
+        }
+
+        function launchConfetti() {
+          for (let i = 0; i < 30; i++) {
+            const confetti = document.createElement("div");
+            confetti.textContent = "🎊";
+            confetti.style.position = "fixed";
+            confetti.style.left = Math.random() * window.innerWidth + "px";
+            confetti.style.top = "-20px";
+            confetti.style.fontSize = "20px";
+            confetti.style.animation = `fall ${2 + Math.random() * 3}s linear forwards`;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 5000);
+          }
+        }
+
+        function updateProgress() {
+          const percent = Math.min((streakCount / 7) * 100, 100);
+          const circle = document.getElementById("progressCircle");
+          circle.textContent = Math.round(percent) + "%";
+          circle.style.borderColor = percent === 100 ? "#4caf50" : "#ccc";
+        }
+
+        function updateEncouragement() {
+          if (streakCount > 0) {
+            document.getElementById("encouragement").textContent =
+              `You’ve journaled ${streakCount} days in a row — keep going!`;
+          }
+        }
+
+        // Initial load
+        buildCalendar(currentMonth, currentYear);
+        loadPrompt();
+      </script>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Digital Mood Garden</title>
+  <style>
+    :root {
+      --bg-color: #f0fdf4;
+      --text-color: #333;
+      --panel-bg: white;
+    }
+    body.calm-mode {
+      --bg-color: #0f172a;
+      --text-color: #e2e8f0;
+      --panel-bg: #1e293b;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      transition: all 0.5s ease;
+    }
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+    body.calm-mode h1 {
+      color: #6ee7b7;
+    }
+    .garden-container {
+      width: 100%;
+      max-width: 900px;
+      height: 500px;
+      background: var(--panel-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+      border: 2px solid #ccc;
+    }
+    body.calm-mode .garden-container {
+      border-color: #334155;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      background: #8d6e63;
+      border-top: 5px solid #4caf50;
+    }
+    body.calm-mode .ground {
+      background: #3e2723;
+      border-top: 5px solid #2e7d32;
+    }
+    .flower {
+      position: absolute;
+      bottom: 60px;
+      width: 40px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      transform-origin: bottom center;
+      animation: grow 1s ease-out forwards;
+      opacity: 0;
+    }
+    .stem {
+      width: 6px;
+      height: 0;
+      background: #4caf50;
+      border-radius: 3px;
+      animation: growStem 1s ease-out forwards;
+    }
+    .bloom {
+      font-size: 36px;
+      margin-bottom: -10px;
+      z-index: 2;
+      transform: scale(0);
+      animation: bloomFlower 0.5s 0.8s ease-out forwards;
+    }
+    @keyframes growStem {
+      to { height: 60px; }
+    }
+    @keyframes bloomFlower {
+      to { transform: scale(1); }
+    }
+    @keyframes grow {
+      to { opacity: 1; }
+    }
+    .sky {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.2; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+    button {
+      background: #4caf50; color: white; border: none;
+      padding: 10px 15px; border-radius: 5px; cursor: pointer;
+      font-size: 16px; margin-top: 20px;
+    }
+    button:hover { background: #45a049; }
+    
+    .stats {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+    .interactive-tree {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      font-size: 150px;
+      transform-origin: bottom center;
+      transition: transform 0.1s ease;
+      z-index: 5;
+    }
+    .progress-container {
+      width: 100%; max-width: 400px; height: 12px; background: #ddd; border-radius: 6px; margin: 10px 0; overflow: hidden;
+    }
+    body.calm-mode .progress-container { background: #334155; }
+    .progress-bar {
+      width: 0%; height: 100%; background: #4caf50; transition: width 0.1s;
+    }
+    body.calm-mode .progress-bar { background: #3b82f6; }
+  </style>
+</head>
+<body>
+  <h1>Digital Mood Garden</h1>
+  <p>Your journal entries nurture this space. Keep journaling to grow your garden!</p>
+  
+  <p id="instructionText">Hold <b>SPACEBAR</b> for 5 seconds to plant a grand tree!</p>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="stats" id="gardenStats">Plants grown: 0</div>
+  
+  <div class="garden-container" id="garden">
+    <div class="sky" id="sky"></div>
+    <div class="ground"></div>
+    <div class="interactive-tree" id="interactiveTree">🌳</div>
+  </div>
+
+  <button onclick="window.location.href='index.html'">⬅ Back to Dashboard</button>
+
+  <script>
+    // Check for Calm Mode
+    if (localStorage.getItem("calmMode") === "true") {
+      document.body.classList.add("calm-mode");
+      createStars();
+    }
+
+    function createStars() {
+      const sky = document.getElementById("sky");
+      for(let i=0; i<30; i++) {
+        let star = document.createElement("div");
+        star.className = "star";
+        star.style.width = Math.random() * 3 + "px";
+        star.style.height = star.style.width;
+        star.style.left = Math.random() * 100 + "%";
+        star.style.top = Math.random() * 70 + "%";
+        star.style.animationDelay = Math.random() * 2 + "s";
+        sky.appendChild(star);
+      }
+    }
+
+    // Load streak/plants from localStorage
+    let streakCount = parseInt(localStorage.getItem("streakCount")) || 0;
+    
+    // For demo purposes, if streak is 0, let's at least show 1 plant if they have visited
+    if (streakCount === 0) {
+        streakCount = 1; 
+    }
+
+    document.getElementById("gardenStats").textContent = `Plants grown: ${streakCount}`;
+
+    const garden = document.getElementById("garden");
+    const flowers = ["🌻", "🌷", "🌹", "🌺", "🌸", "🌼", "🍄"];
+
+    function plantFlower(index) {
+      setTimeout(() => {
+        const flowerContainer = document.createElement("div");
+        flowerContainer.className = "flower";
+        // Position randomly along the x-axis
+        const xPos = 10 + Math.random() * 80; // between 10% and 90%
+        flowerContainer.style.left = xPos + "%";
+        
+        // Random slight height variation
+        const heightVar = Math.random() * 20;
+        flowerContainer.style.bottom = (60 - heightVar) + "px";
+
+        const bloom = document.createElement("div");
+        bloom.className = "bloom";
+        bloom.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+
+        const stem = document.createElement("div");
+        stem.className = "stem";
+        // randomize stem height
+        stem.style.animation = `growStem ${1 + Math.random()*0.5}s ease-out forwards`;
+
+        flowerContainer.appendChild(bloom);
+        flowerContainer.appendChild(stem);
+        garden.appendChild(flowerContainer);
+      }, index * 300); // Stagger the planting animation
+    }
+
+    // Plant flowers based on streak
+    for (let i = 0; i < Math.min(streakCount, 30); i++) {
+      plantFlower(i);
+    }
+
+    // Interactive Tree Logic
+    let growthProgress = 0;
+    let isGrowing = false;
+    let growInterval;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !isGrowing && growthProgress < 100) {
+        e.preventDefault(); // Prevent page scroll
+        isGrowing = true;
+        document.getElementById("instructionText").innerHTML = `Keep holding... <span id="growthPercent">${Math.floor(growthProgress)}%</span>`;
+        
+        growInterval = setInterval(() => {
+          growthProgress += 100 / 50; // 50 ticks of 100ms = 5 seconds
+          if (growthProgress >= 100) {
+            growthProgress = 100;
+            clearInterval(growInterval);
+            document.getElementById("instructionText").innerHTML = "Tree Fully Grown! 🌳✨";
+            
+            // Save to streak
+            streakCount++;
+            localStorage.setItem("streakCount", streakCount);
+            document.getElementById("gardenStats").textContent = `Plants grown: ${streakCount}`;
+            
+            // Launch Confetti
+            for(let i=0; i<20; i++) {
+               const c = document.createElement("div");
+               c.textContent = "✨";
+               c.style.position = "absolute";
+               c.style.left = (40 + Math.random()*20) + "%";
+               c.style.bottom = (60 + Math.random()*40) + "%";
+               c.style.fontSize = "24px";
+               c.style.transition = "all 1s ease-out";
+               garden.appendChild(c);
+               setTimeout(() => { c.style.transform = `translate(${Math.random()*100-50}px, -100px)`; c.style.opacity = "0"; }, 50);
+               setTimeout(() => c.remove(), 1050);
+            }
+          }
+          updateTree();
+        }, 100);
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (e.code === "Space") {
+        isGrowing = false;
+        clearInterval(growInterval);
+        if (growthProgress < 100 && growthProgress > 0) {
+          document.getElementById("instructionText").innerHTML = `Hold <b>SPACEBAR</b> to keep growing! <span id="growthPercent">${Math.floor(growthProgress)}%</span>`;
+        }
+      }
+    });
+
+    function updateTree() {
+      document.getElementById("progressBar").style.width = growthProgress + "%";
+      document.getElementById("interactiveTree").style.transform = `translateX(-50%) scale(${growthProgress / 100})`;
+      const percentEl = document.getElementById("growthPercent");
+      if(percentEl) percentEl.textContent = Math.floor(growthProgress) + "%";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MINDSCRIBE - Physical Wellness</title>
+  <style>
+    :root {
+      --bg-color: #f0fdf4;
+      --text-color: #333;
+      --panel-bg: white;
+      --heading-color: #2e7d32;
+    }
+    body.calm-mode {
+      --bg-color: #0f172a;
+      --text-color: #e2e8f0;
+      --panel-bg: #1e293b;
+      --heading-color: #6ee7b7;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      transition: background 0.5s ease, color 0.5s ease;
+      min-height: 100vh;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: var(--heading-color);
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+    .card {
+      background: var(--panel-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+      transition: background 0.5s ease;
+      border-left: 5px solid #4caf50;
+    }
+    body.calm-mode .card {
+      border-left: 5px solid #3b82f6;
+    }
+    .card h2 {
+      margin-top: 0;
+      color: var(--heading-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card p {
+      line-height: 1.6;
+      font-size: 16px;
+    }
+    .benefits-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .benefits-list li {
+      margin-bottom: 10px;
+      padding-left: 25px;
+      position: relative;
+    }
+    .benefits-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #4caf50;
+      font-weight: bold;
+    }
+    body.calm-mode .benefits-list li::before {
+      color: #6ee7b7;
+    }
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+    }
+    button:hover { background: #45a049; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Physical Wellness & Mental Health</h1>
+    
+    <div class="card">
+      <h2>🧘‍♀️ The Benefits of Yoga</h2>
+      <p>Yoga is a mind-body practice that combines physical poses, controlled breathing, and meditation or relaxation. It is incredibly effective for mental wellness.</p>
+      <ul class="benefits-list">
+        <li><strong>Reduces Stress and Anxiety:</strong> Yoga lowers cortisol levels (the stress hormone) and encourages relaxation.</li>
+        <li><strong>Improves Mood:</strong> Regular practice can boost your mood and help alleviate symptoms of depression.</li>
+        <li><strong>Enhances Mindfulness:</strong> The focus on breath and movement brings you into the present moment, stopping racing thoughts.</li>
+        <li><strong>Better Sleep:</strong> Calming yoga routines before bed can help you fall asleep faster and stay asleep longer.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>🏃‍♂️ The Power of Exercise</h2>
+      <p>Physical activity isn't just about building muscle; it is one of the most powerful tools we have for maintaining mental health.</p>
+      <ul class="benefits-list">
+        <li><strong>Endorphin Release:</strong> Exercise releases "feel-good" chemicals in the brain that act as natural painkillers and mood elevators.</li>
+        <li><strong>Brain Health:</strong> Cardiovascular exercise pumps more blood to the brain, improving memory, focus, and cognitive function.</li>
+        <li><strong>Confidence Boost:</strong> Achieving exercise goals, no matter how small, boosts self-esteem and body image.</li>
+        <li><strong>Social Connection:</strong> Group exercises, running clubs, or gym classes offer great opportunities to connect with others.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>🚶‍♀️ Simple Ways to Start Today</h2>
+      <p>You don't need a gym membership or an hour of free time to see benefits. Try these small steps:</p>
+      <ul class="benefits-list">
+        <li>Take a 10-minute brisk walk outside during your lunch break.</li>
+        <li>Follow a 5-minute beginner stretching or yoga video on YouTube.</li>
+        <li>Do 15 jumping jacks or dance to your favorite song in your living room.</li>
+        <li>Take the stairs instead of the elevator.</li>
+      </ul>
+    </div>
+
+    <button onclick="window.location.href='index.html'">⬅ Back to Dashboard</button>
+  </div>
+
+  <script>
+    // Load Calm Mode Preference to match the main dashboard
+    if (localStorage.getItem("calmMode") === "true") {
+      document.body.classList.add("calm-mode");
+    }
+  </script>
+</body>
+</html>
