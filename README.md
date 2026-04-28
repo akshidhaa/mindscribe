@@ -1,22 +1,33 @@
-# 🧠 MindScribe
+# 🧠 MindScribe – Mental Wellness Companion
 
-MindScribe is a simple web application built using **Node.js** and **HTML**.  
-It provides an interactive interface for users (customize based on your project purpose).
+MindScribe is a **mental health-focused web application** designed to help users express their thoughts, manage stress, and improve emotional well-being through simple digital journaling and interaction.
+
+---
+
+## 🌿 Objective
+
+In today’s fast-paced world, mental health often gets overlooked.  
+MindScribe aims to provide a **safe and simple space** where users can:
+
+- Write down their thoughts
+- Reflect on emotions
+- Reduce stress through expression
 
 ---
 
 ## 🚀 Features
 
-- Simple and clean UI
-- Node.js backend
-- Multiple HTML pages
-- Easy to deploy
+- ✍️ Digital journaling interface
+- 🧘 Clean and distraction-free UI
+- 💡 Encourages self-reflection
+- 🌐 Accessible through browser
+- ⚡ Lightweight and fast
 
-
+---
 
 ## 🛠️ Tech Stack
 
-- Node.js
-- Express.js
-- HTML, CSS, JavaScript
+- **Backend:** Node.js, Express.js  
+- **Frontend:** HTML, CSS, JavaScript  
+
 
